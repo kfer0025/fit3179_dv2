@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Commuting and Public Transport in Australia’s Major Cities</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- full window bg -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Source+Sans+3:wght@300;400;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root {
+        --bg: #E8F5E9;
+        --heading: #1B5E20;
+        --accent: #43A047;
+        --text: #111111;
+        }
+
+    html {
+        scroll-behavior: smooth;
+        background-color: var(--bg); 
+    }
+
+    body {
+        font-family: "Source Sans 3", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background-color: transparent;
+        margin: 0;
+        padding: 24px 8px;  /* space around white page */
+        line-height: 1.6;
+        color: var(--text);
+        scroll-snap-type: none; /* snap scroll between panels */
+    }
+
+    /* main white page */
+    .page {
+        max-width: 850px;
+        margin: 0 auto 0;
+        border-radius: 16px;
+        padding: 32px 28px 40px;
+    }
+    
+     
+    /* no full-screen panels; just normal sections */
+    header,
+    section {
+        scroll-snap-align: start;
+        min-height: auto;
+        display: block;
+    }
+
+    /* base state for fade or slide */
+    header,
+    section {
+        opacity: 0;
+        transform: translateY(40px);
+        transition:
+            opacity 0.8s ease-out,
+            transform 0.8s ease-out;
+    }
+
+    /* when visible */
+    header.in-view,
+    section.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    header {
+        text-align: center;
+        margin: 4rem 0 4rem; 
+        padding: 2rem 0;
+    }
+
+    h1,
+    h2 {
+        font-family: "Montserrat", sans-serif;
+        color: var(--heading);
+    }
+
+    /* main title */
+    h1 {
+        font-weight: 700;
+        font-size: 2rem;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    /* accent bar under title */
+    h1::after {
+        content: "";
+        display: block;
+        width: 140px;
+        height: 4px;
+        background-color: var(--accent);
+        margin: 12px auto 0;
+        border-radius: 999px;
+    }
+
+    header p {
+        font-size: 0.9rem;
+        max-width: 700px;
+        margin: 0.8rem auto 0;
+        text-align: center;
+    }
+
+    /* section headings: shared spacing for all sections */
+    .page section h2 {
+        margin-top: 0.6rem;      
+        margin-bottom: 0.15rem;  
+        font-weight: 600;
+        font-size: 1.5rem;
+    }
+
+    main p {
+        font-size: 0.85rem;
+        text-align: left;
+    }
+
+    /* first paragraph (subtitle) in each section */
+    .page section > p {
+        margin-top: 0;           
+        margin-bottom: 0.5rem;   /* small gap before content/chart */
+        font-style: italic;      /* subtitles italic */
+    }
+
+    /* chart boxes */
+    .chart-container {
+        margin-top: 0.75rem;
+        width: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+        padding: 1rem 1.5rem 1.25rem 0; 
+    }
+
+    .chart-inner {
+        background-color: #ffffff;
+        border-radius: 20px;
+        overflow: hidden;
+        padding: 1.5rem 2rem 1.75rem 1rem; 
+    }
+
+    .chart-notes {
+        margin-top: 1rem;   
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .chart-notes h3 {
+        margin: 0 0 0.4rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--heading);
+    }
+
+    .chart-notes ul {
+        margin: 0;
+        font-size: 0.8rem;
+        padding-left: 1.2rem;
+        font-weight: 300;
+    }
+
+    .chart-notes li {
+        margin-bottom: 0.25rem;
+    }
+
+    .keyword {
+        color: var(--heading);
+        font-weight: 600;
+    }
+    .hero-meta {
+        font-size: 0.75rem;
+        margin-top: 0.8rem;
+        opacity: 0.8;
+    }
+
+    .summary-card {
+        background-color: #ffffff;
+        border-radius: 20px;
+        padding: 1.5rem 2rem;
+        margin-top: 0.75rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        max-width: 80rem;
+    }
+
+    /* Make fonts inside the summary card consistent */
+    .summary-card p,
+    .summary-card li {
+        font-size: 0.9rem;          /* same as normal body text */
+        line-height: 1.6;
+        font-weight: 350;
+    }
+
+    /* Slightly emphasise the opening sentence + final line */
+    .summary-card > p:first-child,
+    .summary-card .summary-final {
+        font-size: 1.05rem;
+    }
+
+    /* Use heading green for key phrases */
+    .summary-card strong {
+        color: var(--heading);    /* same green as your main headings */
+        font-weight:1000;
+    }
+    .summary-card ul {
+        margin-top: 0.75rem;
+        margin-bottom: 0.75rem;
+        padding-left: 1.25rem;
+    }
+
+    .summary-card li {
+        margin-bottom: 0.6rem;
+    }
+
+    .summary-final {
+        margin-top: 0.75rem;
+    }
+
+  </style>
+
+  <!-- vega libs -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+</head>
+
+<body>
+  <div class="page">
+    <header>
+        <h1>Commuting and Public Transport in Australia’s Major Cities</h1>
+        <p>
+            These visualisations compare how people travelled to work in 2016 and 2021 in Australia’s five largest cities; Sydney, Melbourne, Brisbane, Perth and Adelaide, and examine how access to frequent public transport, alongside changing work-from-home patterns, relates to our ongoing reliance on cars.
+        </p>
+        <p class="hero-meta">
+            Author: Oneli Fernando · Data sources: ABS Census 2016 &amp; 2021;
+            Climate Council, “Next Stop Suburbia”.
+        </p>
+
+    </header>
+
+    <main>
+
+        <!--Section One-->
+        <section id="section-one">
+            <h2>How did commuting change between 2016 and 2021?</h2>
+            <p>
+                Each stacked bar shows the share of workers using each main way of getting to work in 2016 and 2021. Within each year, read across the cities to see how driving, public transport, walking or cycling, and working from home add up to 100%.
+            </p>
+
+            <!-- chart 1 card: chart + key observations -->
+            <div class="chart-container">
+                <div class="chart-inner">
+                    <!-- chart goes here -->
+                    <div id="chart-commute-change"></div>
+                </div>
+
+                <!-- text below the chart -->
+                <div class="chart-notes">
+                    <h3>Key observations</h3>
+                    <ul>
+                        <li>Working from home increased sharply between 2016 and 2021, especially in Melbourne and Sydney.</li>
+                        <li>Public transport’s share of commuting fell in every city over the same period.</li>
+                        <li>In every city, driving remained the main way of getting to work in both 2016 and 2021.</li>
+                        <li>Walking and cycling stayed small, always accounting for only a minor share of work trips (well under 10%).</li>
+                    </ul>
+
+                    <p>
+                        <b>In 2016, Sydney stood out with the lowest car share and the highest public transport share, while Perth and 
+                            Adelaide relied most on cars. By 2021 that pattern remained, Perth and Adelaide still had the highest car dependence and Sydney the lowest, even though public transport’s share fell sharply in every city.<br>
+                        </b>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!--Section Two-->
+        <section id="section-two">
+            <h2>How access to frequent public transport differs between cities</h2>
+            <p>
+            This bubble map shows the percentage of residents in each city who live in areas without frequent all-day public transport. Each circle is a city; larger circles mean more people without frequent services near home.
+            </p>
+
+            <!-- chart 1 card: chart + key observations -->
+            <div class="chart-container">
+                <div class="chart-inner">
+                    <!-- chart goes here -->
+                    <div id="pt-access-map"></div>
+                </div>
+
+                <!-- text below the chart -->
+                <div class="chart-notes">
+                    <h3>Key observations</h3>
+                    <ul>
+                        <li>Brisbane has the weakest access: about two-thirds of residents (66%) lack frequent all-day public transport.</li>
+                        <li>Perth and Adelaide also fare poorly, with around 60% and just over half of residents missing frequent services.</li>
+                        <li>Melbourne sits in the middle, with about half of residents (48%) living away from frequent routes. </li>
+                        <li>Sydney is best served: about one-third of residents (33%) lack frequent services, noticeably lower than in other cities.</li>
+                    </ul>
+
+                    <p>
+                        <b>Across Australia’s largest cities, access to frequent public transport is uneven. In Brisbane, Perth and Adelaide most residents live far from frequent services, helping explain why driving remains so dominant.</b>
+                    </p>
+                </div> 
+            </div>           
+        </section>
+
+        <!--Section Three-->
+        <section id="section-three">
+            <h2>Did more working from home in 2021 reduce car commuting?</h2>
+            <p>
+                These slope charts compare changes in working-from-home and car commuting between 2016 and 2021 in each city. Each line is a city: lines sloping upwards show an increase in that mode, and lines sloping downwards show a decrease.
+                <br><b>Note: the vertical axis runs from 0–80% (not 0–100%) to highlight the small differences between values.</b>
+            </p>
+
+            <!-- chart 1 card: chart + key observations -->
+            <div class="chart-container">
+                <div class="chart-inner">
+                    <!-- chart goes here -->
+                    <div id="wfh-car-slope"></div>
+                </div>
+
+                <!-- text below the chart -->
+                <div class="chart-notes">
+                    <h3>Key observations</h3>
+                    <ul>
+                        <li>Working from home rose in every city, especially Sydney and Melbourne (around 30–40% WFH in 2021).</li>
+                        <li>Car commuting fell everywhere, with the biggest drops in Sydney and Melbourne.</li>
+                        <li>Even in 2021, most workers in every city still travelled to work by car.</li>
+                        <li>Perth and Adelaide saw only small WFH gains and remain the most car-dependent, with Brisbane in the middle.</li>
+                    </ul>
+
+                    <p>
+                        <b>Working from home has eased car commuting, especially in Sydney and Melbourne, but cars remain the main way most 
+                            workers travel to work in 2021.</b>
+                    </p>
+                </div>          
+            </div>
+        </section>
+
+        <!--Section Four-->
+        <section id="section-four">
+            <h2>Does better public transport access mean more people commute by public transport?</h2>
+            <p>
+                This scatter plot compares each city’s public transport access with the share of workers who 
+                used public transport to get to work in 2021. Each point is a city: cities further to the right 
+                have more residents without frequent services near home, and cities higher up have more workers 
+                commuting by public transport. 
+                <br><b>Note: the vertical axis runs from 0–25% (not 0–100%) to highlight the small differences between cities.</b>
+            </p>
+
+            <!-- chart 1 card: chart + key observations -->
+            <div class="chart-container">
+                <div class="chart-inner">
+                    <!-- chart goes here -->
+                    <div id="pt-access-vs-use"></div>
+                </div>
+
+                <!-- text below the chart -->
+                <div class="chart-notes">
+                    <h3>Key observations</h3>
+                    <ul>
+                        <li>If access really drove public transport use, cities with fewer residents without frequent PT (further left) would sit higher, but the points are scattered.</li>
+                        <li>Sydney has the best access but only a modest share of workers commuting by public transport.</li>
+                        <li>Perth and Brisbane both have poor access, yet Perth’s PT commuting is higher, suggesting other factors also matter.</li>
+                        <li>Across all five cities, only about 5–9% of workers commute by public transport, even where access is relatively good.</li>
+                    </ul>
+
+                    <p>
+                        <b>Access to frequent public transport helps, but this chart shows it isn’t enough on its own: even where access is relatively good, only a small minority commute 
+                            by public transport, so car travel remains dominant.</b>
+                    </p>
+                </div> 
+            </div>
+        </section>
+
+        <!--Section Five-->
+        <section id="section-5">
+            <h1>What does this mean for car dependence?</h1>
+
+            <div class="summary-card">
+                <p>Taken together, these visualisations show that Australia’s major cities remain highly car dependent.</p>
+
+                <ul>
+                <li>
+                    <strong>Working from home surged, but cars still dominate.</strong>
+                    Working from home rose and public transport use fell between 2016 and 2021, yet driving remained the main way of getting to work in every city.
+                </li>
+                <li>
+                    <strong>Public transport access is uneven.</strong>
+                    Many residents, especially in Brisbane, Perth and Adelaide, still live far from frequent all-day services.
+                </li>
+                <li>
+                    <strong>Even in better-served cities, few people commute by PT.</strong>
+                    In Sydney and Melbourne, which have the strongest networks, only a minority of workers use public transport to get to work.
+                </li>
+                </ul>
+
+                <p class="summary-final">
+                <strong>Overall, reducing car dependence will require both better public transport access and broader changes in how and where people work.</strong>
+                </p>
+            </div>
+        </section>
+
+                <!--Section Six: Data sources & credits-->
+        <section id="sources">
+            <h2>Data sources</h2>
+
+            <p>All charts on this page are based on the following public data sources:</p>
+
+            <p>
+                <strong>Commuting patterns (2016 &amp; 2021):</strong>
+                Australian Bureau of Statistics (ABS),
+                <em>Census of Population and Housing 2016 &amp; 2021</em>.
+                Percentages by commuting mode were calculated from custom tables created using
+                <a href="https://dbr.abs.gov.au/index.html" target="_blank" rel="noopener">
+                    ABS Data by Region
+                </a>
+                for Sydney, Melbourne, Brisbane, Perth and Adelaide.
+            </p>
+
+            <p>
+                <strong>Public transport access:</strong>
+                Climate Council (2024),
+                <em>Next Stop Suburbia: Making shared transport work for everyone in Aussie cities</em>,
+                key findings section. Figures used are the reported share of residents without
+                access to frequent all-day public transport in each city
+                (<a href="https://www.climatecouncil.org.au/resources/next-stop-suburbia/"
+                   target="_blank" rel="noopener">
+                    climatecouncil.org.au
+                </a>).
+            </p>
+
+            <p>
+                <strong>City locations:</strong>
+                Approximate CBD latitude and longitude for each city were taken from its
+                Wikipedia article (accessed 18 November 2025) and used to place the city
+                markers on the map.
+            </p>
+
+            <p class="hero-meta">
+                Percentages shown in the charts were calculated by the author from these sources.
+                Page created by Oneli Fernando for FIT3179 Data Visualisation 2 (Semester 2, 2025).
+            </p>
+        </section>
+
+    </main>
+
+
+
+    <script>
+        // fade in panels on scroll
+        const panels = document.querySelectorAll("header, section");
+
+        const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("in-view");
+                }
+            });
+        },
+        {
+            threshold: 0.4,
+        }
+        );
+
+        panels.forEach((panel) => observer.observe(panel));
+    </script>
+
+    <!-- Vega-Lite chart 1: commuting change -->
+    <script>
+        const commuteChangeSpec = {
+            $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+            description: "Commuting mode share by city and year",
+            data: {
+                url: "data/commute_mode_long.csv"
+            },
+
+        width: 270,
+        height: 180,
+
+        mark: "bar",
+
+        encoding: {
+            column: {
+            field: "year",
+            type: "ordinal",
+            title: "Census year",
+            header: {
+                labelFontSize: 12,      
+                labelFontWeight: "bold" 
+                }
+            },
+        
+        x: {
+            field: "city",
+            type: "nominal",
+            title: "City",
+            sort: ["Adelaide", "Brisbane", "Melbourne", "Perth", "Sydney"],
+            axis: { labelAngle: 0 },
+            scale: {
+            paddingInner: 0.28,
+            paddingOuter: 0.1
+            }
+        },
+
+        y: {
+            field: "pct",
+            type: "quantitative",
+            stack: "normalize",
+            title: "Share of workers (%)",
+            axis: { format: "%" }
+        },
+
+        color: {
+          field: "mode",
+          type: "nominal",
+          title: "Main way of commuting",
+          scale: {
+            domain: [
+              "Car (any)",
+              "Public transport (any)",
+              "Walk/cycle only",
+              "Work from home"
+            ],
+            range: [
+              "#99C1B9",
+              "#F2D0A9",
+              "#F1E3D3",
+              "#D88C9A"
+            ]
+          },
+          legend: { title: "Mode" }
+        },
+
+        tooltip: [
+          { field: "city", type: "nominal", title: "City" },
+          { field: "year", type: "ordinal", title: "Year" },
+          { field: "mode", type: "nominal", title: "Mode" },
+          {
+            field: "pct",
+            type: "quantitative",
+            title: "Share of workers",
+            format: ".1f"
+          }
+        ]
+      },
+
+      config: {
+        facet: { spacing: 30 },
+        view: { stroke: null },
+        header: {
+            titleFontSize: 13
+        },
+        axis: {
+            labelFontSize: 11,
+            titleFontSize: 12
+        },
+        legend: {
+          labelFontSize: 11,
+          titleFontSize: 12
+        }
+      }
+    };
+
+    vegaEmbed("#chart-commute-change", commuteChangeSpec, { actions: false })
+      .catch(console.error);
+  </script>
+
+  <!-- Vega-Lite chart 2: pt access map -->
+   <script>
+        const ptAccessMapSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "description": "Bubble map of Australian cities showing % of residents without frequent public transport.",
+            "width": 600,
+            "height": 350,
+            "projection": {
+            "type": "mercator",
+            "center": [134, -27],
+            "scale": 500
+            },
+            "layer": [
+            {
+                "data": {
+                "url": "https://vega.github.io/vega-datasets/data/world-110m.json",
+                "format": { "type": "topojson", "feature": "countries" }
+                },
+                "transform": [
+                { "filter": "datum.id == 36" }
+                ],
+                "mark": {
+                "type": "geoshape",
+                "fill": "#e0e0e0",
+                "stroke": "white"
+                }
+            },
+            {
+                "data": {
+                "url": "data/pt_access_map.csv"
+                },
+                "mark": {
+                "type": "circle",
+                "opacity": 0.85,
+                "strokeWidth": 5
+                },
+                "encoding": {
+                "longitude": { "field": "longitude", "type": "quantitative" },
+                "latitude": { "field": "latitude", "type": "quantitative" },
+                "size": {
+                    "field": "pct_without_frequent_PT",
+                    "type": "quantitative",
+                    "scale": { "domain": [30, 70], "range": [600, 3600] },
+                    "legend": null
+                },
+                "color": {
+                    "field": "city",
+                    "type": "nominal",
+                    "scale": {
+                    "domain": ["Brisbane", "Perth", "Adelaide", "Melbourne", "Sydney"],
+                    "range": ["#355070", "#6D597A", "#B56576", "#E56B6F", "#EAAC8B"]
+                    },
+                    "legend": { 
+                        "title": "City",
+                        "symbolSize": 300,
+                        "labelFontSize": 13,    // label text size
+                        "titleFontSize": 14
+                    }
+                },
+                "tooltip": [
+                    { "field": "city", "type": "nominal", "title": "City" },
+                    {
+                    "field": "pct_without_frequent_PT",
+                    "type": "quantitative",
+                    "title": "% without frequent PT",
+                    "format": ".1f"
+                    }
+                ]
+                }
+            },
+            {
+                "data": {
+                    "url": "data/pt_access_map.csv"
+                },
+                "mark": {
+                    "type": "circle",
+                    "size": 20,
+                    "color": "#000000",
+                    "opacity": 0.2
+                },
+                "encoding": {
+                    "longitude": { "field": "longitude", "type": "quantitative" },
+                    "latitude": { "field": "latitude", "type": "quantitative" }
+                }
+                },
+
+
+            {
+                "data": {
+                "url": "data/pt_access_map.csv"
+                },
+                "transform": [
+                {
+                    "calculate": "format(datum.pct_without_frequent_PT, '.1f') + '%'",
+                    "as": "pct_label"
+                }
+                ],
+                "mark": {
+                "type": "text",
+                "dy": -30,
+                "dx": 30,
+                "fontSize": 12,
+                "fontWeight": "bold",
+                "fill": "#000000"
+                },
+                "encoding": {
+                "longitude": { "field": "longitude", "type": "quantitative" },
+                "latitude": { "field": "latitude", "type": "quantitative" },
+                "text": { "field": "pct_label", "type": "nominal" }
+                }
+            }
+            ],
+            "config": {
+            "view": { "stroke": null },
+            "legend": { "orient": "right" }
+            }
+        };
+
+        vegaEmbed("#pt-access-map", ptAccessMapSpec, { actions: false })
+            .catch(console.error);
+    </script>
+
+<!-- Vega-Lite chart 3: WFH vs car slope charts -->
+    <script>
+        const wfhCarSlopeSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "description": "Slope charts comparing working from home and car commuting between 2016 and 2021 in each city.",
+            "data": {
+            "url": "data/commute_mode_by_city.csv"
+            },
+            "width": 300,
+            "height": 250,
+            "transform": [
+            {
+                "fold": ["pct_work_from_home", "pct_car_any"],
+                "as": ["mode", "percent"]
+            },
+            {
+                "calculate": "datum.mode == 'pct_work_from_home' ? 'Working from home' : 'Car commuting (any)'",
+                "as": "mode_label"
+            }
+            ],
+            "mark": {
+            "type": "line",
+            "point": {
+                "filled": true,
+                "size": 70
+            },
+            "strokeWidth": 3
+            },
+            "encoding": {
+            "column": {
+                "field": "mode_label",
+                "type": "nominal",
+                "title": null,
+                "header": {
+                "labelFontSize": 14,
+                "labelFontWeight": "bold"
+                }
+            },
+            "x": {
+                "field": "year",
+                "type": "ordinal",
+                "axis": {
+                "title": "Year",
+                "labelAngle": 0
+                }
+            },
+            "y": {
+                "field": "percent",
+                "type": "quantitative",
+                "scale": {
+                    "domain": [0, 80]
+                },
+                "axis": {
+                "title": "% of workers",
+                "format": ".0f"
+                }
+            },
+            "color": {
+                "field": "city",
+                "type": "nominal",
+                "scale": {
+                "domain": ["Brisbane", "Perth", "Adelaide", "Melbourne", "Sydney"],
+                "range": ["#355070", "#6D597A", "#B56576", "#E56B6F", "#EAAC8B"]
+                },
+                "legend": {
+                "title": "City",
+                "symbolSize": 200,
+                "labelFontSize": 12,
+                "titleFontSize": 13
+                }
+            },
+            "tooltip": [
+                { "field": "city", "type": "nominal", "title": "City" },
+                { "field": "year", "type": "ordinal", "title": "Year" },
+                {
+                "field": "mode_label",
+                "type": "nominal",
+                "title": "Mode"
+                },
+                {
+                "field": "percent",
+                "type": "quantitative",
+                "title": "% of workers",
+                "format": ".1f"
+                }
+            ]
+            },
+            
+        };
+
+        vegaEmbed("#wfh-car-slope", wfhCarSlopeSpec, { actions: false })
+            .catch(console.error);
+    </script>
+
+<!-- Vega Lite chart 4: PT access vs PT use-->
+    <script>
+        const ptAccessVsUseSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "description": "Scatter plot comparing public transport access with public transport commuting in 2021.",
+            "data": {
+            "url": "data/commute_mode_by_city.csv"
+            },
+            "width": 550,
+            "height": 230,
+            "padding": { "top": 20, "right": 10, "bottom": 10, "left": 30 },
+            "transform": [
+            { "filter": "datum.year == 2021" },
+            {
+                "lookup": "city",
+                "from": {
+                "data": {
+                    "url": "data/pt_access_map.csv"
+                },
+                "key": "city",
+                "fields": ["pct_without_frequent_PT"]
+                }
+            }
+            ],
+            "mark": {
+            "type": "circle",
+            "size": 220,
+            "opacity": 0.9,
+            "stroke": "white",
+            "strokeWidth": 1.5
+            },
+            "encoding": {
+            "x": {
+                "field": "pct_without_frequent_PT",
+                "type": "quantitative",
+                "axis": {
+                "title": "% of residents without frequent all-day public transport",
+                "format": ".0f",
+                "titlePadding": 16
+                },
+                "scale": { "domain": [0, 100] }
+            },
+            "y": {
+                "field": "pct_public_transport_any",
+                "type": "quantitative",
+                "axis": {
+                "title": "% of workers commuting by any public transport",
+                "format": ".0f",
+                "titlePadding":12
+                },
+                "scale": { "domain": [0, 25] }
+            },
+            "color": {
+                "field": "city",
+                "type": "nominal",
+                "scale": {
+                "domain": ["Brisbane", "Perth", "Adelaide", "Melbourne", "Sydney"],
+                "range": ["#355070", "#6D597A", "#B56576", "#E56B6F", "#EAAC8B"]
+                },
+                "legend": {
+                "title": "City",
+                "symbolSize": 220,
+                "labelFontSize": 12,
+                "titleFontSize": 13
+                }
+            },
+            "tooltip": [
+                { "field": "city", "type": "nominal", "title": "City" },
+                {
+                "field": "pct_without_frequent_PT",
+                "type": "quantitative",
+                "title": "% without frequent PT",
+                "format": ".1f"
+                },
+                {
+                "field": "pct_public_transport_any",
+                "type": "quantitative",
+                "title": "% commuting by PT",
+                "format": ".1f"
+                }
+            ]
+            },
+            "config": {
+            "view": { "stroke": null },
+            "axis": {
+                "gridColor": "#e0e0e0",
+                "domainColor": "#666666",
+                "tickColor": "#666666",
+                "titlePadding":8,
+                "labelFontSize": 11,
+                "titleFontSize": 12,
+                }
+            }
+        };
+
+        vegaEmbed("#pt-access-vs-use", ptAccessVsUseSpec, { actions: false })
+            .catch(console.error);
+    </script>
+</body>
+</html>

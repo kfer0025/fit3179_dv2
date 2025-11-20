@@ -1,0 +1,41 @@
+city,year,mode,pct
+Melbourne,2016,Car (any),66.9
+Melbourne,2016,Public transport (any),15.6
+Melbourne,2016,Walk/cycle only,4.4
+Melbourne,2016,Work from home,4.2
+Melbourne,2021,Car (any),50.9
+Melbourne,2021,Public transport (any),5.4
+Melbourne,2021,Walk/cycle only,2.7
+Melbourne,2021,Work from home,28.8
+Perth,2016,Car (any),71.3
+Perth,2016,Public transport (any),10.3
+Perth,2016,Walk/cycle only,3.1
+Perth,2016,Work from home,3.9
+Perth,2021,Car (any),68.8
+Perth,2021,Public transport (any),8.5
+Perth,2021,Walk/cycle only,2.2
+Perth,2021,Work from home,7.6
+Sydney,2016,Car (any),59.8
+Sydney,2016,Public transport (any),22.8
+Sydney,2016,Walk/cycle only,4.8
+Sydney,2016,Work from home,4.4
+Sydney,2021,Car (any),37.8
+Sydney,2021,Public transport (any),5.6
+Sydney,2021,Walk/cycle only,2.7
+Sydney,2021,Work from home,38.9
+Brisbane,2016,Car (any),69
+Brisbane,2016,Public transport (any),11.6
+Brisbane,2016,Walk/cycle only,4
+Brisbane,2016,Work from home,4.6
+Brisbane,2021,Car (any),60.8
+Brisbane,2021,Public transport (any),6.3
+Brisbane,2021,Walk/cycle only,2.9
+Brisbane,2021,Work from home,17.4
+Adelaide,2016,Car (any),72.5
+Adelaide,2016,Public transport (any),8.8
+Adelaide,2016,Walk/cycle only,3.3
+Adelaide,2016,Work from home,3.6
+Adelaide,2021,Car (any),69.1
+Adelaide,2021,Public transport (any),6.4
+Adelaide,2021,Walk/cycle only,2.9
+Adelaide,2021,Work from home,9.8
